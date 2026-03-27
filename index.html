@@ -53,7 +53,7 @@
                     <button onclick="nextGeneration()" id="btn-next" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-dna"></i> Next Generation
                     </button>
-                    <button onclick="resetGame()" class="w-full mt-2 text-slate-400 text-sm hover:text-slate-600">Reset to Gen 1</button>
+                    <button onclick="resetGame()" class="w-full mt-2 text-slate-400 text-sm hover:text-slate-600 underline">Reset to Gen 1</button>
                 </div>
 
                 <!-- Stats -->
@@ -112,8 +112,8 @@
                     <div id="timeline" class="flex items-end gap-2 h-24 border-b border-slate-100">
                         <!-- History bars -->
                     </div>
-                    <div class="flex justify-between text-[10px] text-slate-400 mt-2">
-                        <span>Start</span>
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-2 uppercase font-bold tracking-wider">
+                        <span>Start (Gen 1)</span>
                         <span>Gen 5</span>
                     </div>
                 </div>
@@ -147,7 +147,6 @@
 
         function nextGeneration() {
             if (generation >= 5) {
-                alert("Five generations complete! Look at your final results.");
                 return;
             }
 
@@ -223,7 +222,8 @@
 
             if (generation === 5) {
                 document.getElementById('btn-next').innerText = "Simulation Complete";
-                document.getElementById('btn-next').className = "w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2";
+                document.getElementById('btn-next').className = "w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-default";
+                document.getElementById('btn-next').onclick = null;
             }
         }
 
@@ -232,6 +232,7 @@
             document.getElementById('timeline').innerHTML = '';
             document.getElementById('btn-next').innerText = "Next Generation";
             document.getElementById('btn-next').className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2";
+            document.getElementById('btn-next').onclick = nextGeneration;
             initPopulation();
         }
 
