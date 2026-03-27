@@ -3,193 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Milk Mystery Game</title>
+    <title>The Milk Mystery Game: Comparison View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;700&display=swap');
         body { font-family: 'Lexend', sans-serif; }
-        .person { transition: all 0.5s ease; }
+        .person { transition: all 0.3s ease; }
         .allele-L { color: #3b82f6; } 
         .allele-l { color: #ef4444; } 
+        .sim-container { min-height: 500px; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen pb-4">
-    <div class="max-w-4xl mx-auto p-4">
+<body class="bg-slate-50 min-h-screen pb-10">
+    <div class="max-w-7xl mx-auto p-4">
         <!-- Header -->
-        <header class="bg-white rounded-2xl shadow-sm p-6 mb-6 mt-4 border-b-4 border-blue-500">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800">🥛 Milk Mystery: Simulation</h1>
-                    <p class="text-slate-500 italic">8th Grade Science: Natural Selection Lab</p>
-                </div>
-                <div class="text-right">
-                    <span id="gen-display" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold">Generation: 1</span>
-                </div>
+        <header class="bg-white rounded-2xl shadow-sm p-6 mb-6 mt-4 border-b-4 border-indigo-500 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">🥛 Milk Mystery: Lab Comparison</h1>
+                <p class="text-slate-500 italic">Compare Natural Selection vs. Genetic Equilibrium</p>
             </div>
+            <button onclick="resetAll()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-xl font-bold transition-colors">
+                <i class="fas fa-undo mr-2"></i> Reset Both
+            </button>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Sidebar: Controls -->
-            <div class="space-y-4">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-bold text-lg mb-4">1. Choose Mode</h2>
-                    <div class="space-y-2">
-                        <button onclick="setMode('none')" id="mode-none" class="w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between">
-                            <span>No Pressure</span>
-                            <i class="fas fa-bread-slice"></i>
-                        </button>
-                        <button onclick="setMode('famine')" id="mode-famine" class="w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between">
-                            <span>Famine (Only Milk)</span>
-                            <i class="fas fa-skull-crossbones"></i>
-                        </button>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- SIMULATION A: NO PRESSURE -->
+            <div class="sim-container bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="bg-blue-500 p-4 text-white flex justify-between items-center">
+                    <h2 class="font-bold flex items-center gap-2"><i class="fas fa-bread-slice"></i> Simulation A: No Pressure</h2>
+                    <span id="gen-a" class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">Gen: 1</span>
                 </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Grid -->
+                    <div id="grid-a" class="grid grid-cols-8 gap-2 min-h-[220px]"></div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-bold text-lg mb-2">2. Play</h2>
-                    <button onclick="nextGeneration()" id="btn-next" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-dna"></i> Next Generation
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">L Allele (Blue)</p>
+                            <p id="stat-a-L" class="text-2xl font-bold text-blue-600">50%</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">l Allele (Red)</p>
+                            <p id="stat-a-l" class="text-2xl font-bold text-red-500">50%</p>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="h-16 border-b border-slate-100 flex items-end gap-1 px-2" id="timeline-a"></div>
+
+                    <button onclick="step('a')" id="btn-a" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all">
+                        Next Generation (A)
                     </button>
-                    <button onclick="resetGame()" class="w-full mt-2 text-slate-400 text-sm hover:text-slate-600 underline">Reset to Gen 1</button>
-                </div>
-
-                <!-- Stats -->
-                <div class="bg-slate-800 text-white p-6 rounded-2xl shadow-sm">
-                    <h2 class="font-bold text-sm uppercase tracking-widest opacity-70 mb-4 text-center">Allele Data</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>L (Can drink milk)</span>
-                                <span id="stat-L-text">50%</span>
-                            </div>
-                            <div class="w-full bg-slate-700 rounded-full h-2">
-                                <div id="bar-L" class="bg-blue-400 h-2 rounded-full transition-all duration-500" style="width: 50%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span>l (Cannot drink milk)</span>
-                                <span id="stat-l-text">50%</span>
-                            </div>
-                            <div class="w-full bg-slate-700 rounded-full h-2">
-                                <div id="bar-l" class="bg-red-400 h-2 rounded-full transition-all duration-500" style="width: 50%"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Main: Population Grid -->
-            <div class="md:col-span-2 space-y-4">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[400px]">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-bold text-xl">The Village Population</h2>
-                    </div>
-                    
-                    <div id="grid" class="grid grid-cols-5 sm:grid-cols-10 gap-4"></div>
+            <!-- SIMULATION B: FAMINE -->
+            <div class="sim-container bg-white rounded-3xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="bg-red-500 p-4 text-white flex justify-between items-center">
+                    <h2 class="font-bold flex items-center gap-2"><i class="fas fa-skull-crossbones"></i> Simulation B: Famine</h2>
+                    <span id="gen-b" class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">Gen: 1</span>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Grid -->
+                    <div id="grid-b" class="grid grid-cols-8 gap-2 min-h-[220px]"></div>
 
-                    <div id="famine-overlay" class="hidden mt-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-4 animate-pulse">
-                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
-                        <div>
-                            <p class="font-bold text-red-800 uppercase text-xs">Environmental Pressure Active</p>
-                            <p class="text-xs text-red-600 italic">"Only those with the L allele survive the famine."</p>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">L Allele (Blue)</p>
+                            <p id="stat-b-L" class="text-2xl font-bold text-blue-600">50%</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                            <p class="text-[10px] uppercase font-bold text-slate-400">l Allele (Red)</p>
+                            <p id="stat-b-l" class="text-2xl font-bold text-red-500">50%</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- History Chart -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold mb-4 text-slate-700">Genetics History (L Allele %)</h3>
-                    <div id="timeline" class="flex items-end gap-2 h-20 border-b-2 border-slate-200"></div>
-                    <div class="flex justify-between text-[10px] text-slate-400 mt-2 uppercase font-bold">
-                        <span>Start</span>
-                        <span>Gen 5</span>
-                    </div>
+                    <!-- History -->
+                    <div class="h-16 border-b border-slate-100 flex items-end gap-1 px-2" id="timeline-b"></div>
+
+                    <button onclick="step('b')" id="btn-b" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-2xl transition-all">
+                        Next Generation (B)
+                    </button>
                 </div>
             </div>
+
         </div>
 
-        <!-- REPOSITORY FOOTER -->
-        <footer class="mt-8 pt-6 border-t border-slate-200 text-center">
-            <div class="flex flex-col items-center gap-2">
-                <div class="flex items-center gap-2 text-slate-500 text-sm">
-                    <i class="fab fa-github"></i>
-                    <span class="font-medium">Repository:</span>
-                    <code class="bg-slate-200 px-2 py-1 rounded text-slate-700">milk-mystery-lab</code>
-                </div>
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest">
-                    Interactive Lab Simulation &copy; 2024
-                </p>
-            </div>
+        <!-- Footer -->
+        <footer class="mt-8 pt-6 border-t border-slate-200 text-center text-slate-400 text-xs">
+            <p>Data for Table 3.3 and Bar Graph (Page 8) | <i class="fab fa-github"></i> milk-mystery-lab</p>
         </footer>
     </div>
 
     <script>
-        let generation = 1;
-        let population = [];
-        let mode = 'none';
+        const SIM_SIZE = 40;
+        let state = {
+            a: { gen: 1, pop: [], mode: 'none' },
+            b: { gen: 1, pop: [], mode: 'famine' }
+        };
 
-        function initPopulation() {
-            population = [];
-            for (let i = 0; i < 40; i++) { population.push({ a1: 'L', a2: 'l' }); }
-            updateUI();
+        function initSim(key) {
+            state[key].gen = 1;
+            state[key].pop = [];
+            for (let i = 0; i < SIM_SIZE; i++) {
+                state[key].pop.push({ a1: 'L', a2: 'l' });
+            }
+            document.getElementById(`timeline-${key}`).innerHTML = '';
+            document.getElementById(`btn-${key}`).disabled = false;
+            document.getElementById(`btn-${key}`).innerText = `Next Generation (${key.toUpperCase()})`;
+            render(key);
         }
 
-        function setMode(m) {
-            mode = m;
-            document.getElementById('mode-none').className = m === 'none' ? 'w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
-            document.getElementById('mode-famine').className = m === 'famine' ? 'w-full py-3 px-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
-            document.getElementById('famine-overlay').classList.toggle('hidden', m !== 'famine');
-            resetGame();
-        }
+        function step(key) {
+            if (state[key].gen >= 5) return;
 
-        function nextGeneration() {
-            if (generation >= 5) return;
-            let parents = mode === 'famine' ? population.filter(p => p.a1 === 'L' || p.a2 === 'L') : [...population];
+            let parents = [...state[key].pop];
+            if (state[key].mode === 'famine') {
+                parents = parents.filter(p => p.a1 === 'L' || p.a2 === 'L');
+            }
+
             if (parents.length < 2) return;
+
             let nextPop = [];
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < SIM_SIZE; i++) {
                 const p1 = parents[Math.floor(Math.random() * parents.length)];
                 const p2 = parents[Math.floor(Math.random() * parents.length)];
-                nextPop.push({ a1: Math.random() > 0.5 ? p1.a1 : p1.a2, a2: Math.random() > 0.5 ? p2.a1 : p2.a2 });
+                nextPop.push({ 
+                    a1: Math.random() > 0.5 ? p1.a1 : p1.a2, 
+                    a2: Math.random() > 0.5 ? p2.a1 : p2.a2 
+                });
             }
-            population = nextPop;
-            generation++;
-            updateUI();
+
+            state[key].pop = nextPop;
+            state[key].gen++;
+            render(key);
         }
 
-        function updateUI() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            let countL = 0;
-            population.forEach(p => {
-                if (p.a1 === 'L') countL++; if (p.a2 === 'L') countL++;
-                const isSick = (p.a1 === 'l' && p.a2 === 'l');
+        function render(key) {
+            const container = document.getElementById(`grid-${key}`);
+            container.innerHTML = '';
+            
+            let lCount = 0;
+            state[key].pop.forEach(p => {
+                if (p.a1 === 'L') lCount++;
+                if (p.a2 === 'L') lCount++;
+                
+                const isSick = p.a1 === 'l' && p.a2 === 'l';
                 const div = document.createElement('div');
-                div.className = 'person flex flex-col items-center';
-                div.innerHTML = `<i class="fas fa-user text-xl ${isSick ? 'text-red-400' : 'text-blue-500'}"></i><div class="text-[8px] font-bold">${p.a1}${p.a2}</div>`;
-                grid.appendChild(div);
+                div.className = 'person flex flex-col items-center justify-center';
+                div.innerHTML = `<i class="fas fa-user text-lg ${isSick ? 'text-red-400' : 'text-blue-500'}"></i><span class="text-[8px] font-bold text-slate-400">${p.a1}${p.a2}</span>`;
+                container.appendChild(div);
             });
-            const percentL = Math.round((countL / (population.length * 2)) * 100);
-            document.getElementById('stat-L-text').innerText = percentL + '%';
-            document.getElementById('stat-l-text').innerText = (100 - percentL) + '%';
-            document.getElementById('bar-L').style.width = percentL + '%';
-            document.getElementById('bar-l').style.width = (100 - percentL) + '%';
-            document.getElementById('gen-display').innerText = `Generation: ${generation}`;
+
+            const lPercent = Math.round((lCount / (SIM_SIZE * 2)) * 100);
+            document.getElementById(`stat-${key}-L`).innerText = lPercent + '%';
+            document.getElementById(`stat-${key}-l`).innerText = (100 - lPercent) + '%';
+            document.getElementById(`gen-${key}`).innerText = `Gen: ${state[key].gen}`;
+
+            // Add bar to history
             const bar = document.createElement('div');
-            bar.className = 'flex-1 bg-blue-400 rounded-t';
-            bar.style.height = `${percentL}%`;
-            document.getElementById('timeline').appendChild(bar);
+            bar.className = `flex-1 ${key === 'a' ? 'bg-blue-400' : 'bg-red-400'} rounded-t`;
+            bar.style.height = `${lPercent}%`;
+            document.getElementById(`timeline-${key}`).appendChild(bar);
+
+            if (state[key].gen >= 5) {
+                const btn = document.getElementById(`btn-${key}`);
+                btn.disabled = true;
+                btn.innerText = "Simulation Finished";
+                btn.className = "w-full bg-slate-200 text-slate-400 font-bold py-4 rounded-2xl cursor-not-allowed";
+            }
         }
 
-        function resetGame() {
-            generation = 1;
-            document.getElementById('timeline').innerHTML = '';
-            initPopulation();
+        function resetAll() {
+            initSim('a');
+            initSim('b');
         }
 
-        window.onload = initPopulation;
+        window.onload = resetAll;
     </script>
 </body>
 </html>
