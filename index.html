@@ -22,7 +22,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800">🥛 Milk Mystery: Simulation</h1>
-                    <p class="text-slate-500">Watch how DNA changes over 5 generations!</p>
+                    <p class="text-slate-500 italic">Watch how DNA changes over 5 generations!</p>
                 </div>
                 <div class="text-right">
                     <span id="gen-display" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold">Generation: 1</span>
@@ -36,13 +36,17 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h2 class="font-bold text-lg mb-4">1. Choose Mode</h2>
                     <div class="space-y-2">
-                        <button onclick="setMode('none')" id="mode-none" class="w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between">
+                        <button onclick="setMode('none')" id="mode-none" class="w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between transition-all">
                             <span>No Pressure</span>
                             <i class="fas fa-bread-slice"></i>
                         </button>
-                        <button onclick="setMode('famine')" id="mode-famine" class="w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between">
+                        <button onclick="setMode('famine')" id="mode-famine" class="w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between transition-all">
                             <span>Famine (Only Milk)</span>
                             <i class="fas fa-skull-crossbones"></i>
+                        </button>
+                        <button onclick="setMode('trace')" id="mode-trace" class="w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between transition-all">
+                            <span>Ll x Ll Trace</span>
+                            <i class="fas fa-microscope"></i>
                         </button>
                     </div>
                     <p class="text-xs text-slate-400 mt-3 italic" id="mode-desc">Simulation 1: Everyone survives regardless of DNA.</p>
@@ -86,10 +90,10 @@
             <div class="md:col-span-2 space-y-4">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[400px]">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-bold text-xl">The Village</h2>
+                        <h2 class="font-bold text-xl" id="village-title">The Village</h2>
                         <div class="flex gap-4 text-xs font-bold">
-                            <span class="flex items-center gap-1"><i class="fas fa-user text-blue-500"></i> LL/Ll (Healthy)</span>
-                            <span class="flex items-center gap-1"><i class="fas fa-user text-red-500"></i> ll (Sick)</span>
+                            <span class="flex items-center gap-1"><i class="fas fa-user text-blue-500"></i> LL/Ll (Tolerant)</span>
+                            <span class="flex items-center gap-1"><i class="fas fa-user text-red-500"></i> ll (Intolerant)</span>
                         </div>
                     </div>
                     
@@ -102,6 +106,14 @@
                         <div>
                             <p class="font-bold text-red-800">Famine Active!</p>
                             <p class="text-xs text-red-600">Only Milk Drinkers (L) are surviving to reproduce.</p>
+                        </div>
+                    </div>
+
+                    <div id="trace-info" class="hidden mt-8 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-4">
+                        <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+                        <div>
+                            <p class="font-bold text-blue-800">Tracking Offspring (Ll x Ll)</p>
+                            <p class="text-xs text-blue-600 italic">Every child in this generation comes from two Heterozygous (Ll) parents.</p>
                         </div>
                     </div>
                 </div>
@@ -124,10 +136,8 @@
     <script>
         let generation = 1;
         let population = [];
-        let mode = 'none'; // 'none' or 'famine'
-        let history = [];
+        let mode = 'none'; // 'none', 'famine', or 'trace'
 
-        // Initial Population: Everyone is Ll (50% L, 50% l)
         function initPopulation() {
             population = [];
             for (let i = 0; i < 40; i++) {
@@ -138,40 +148,62 @@
 
         function setMode(m) {
             mode = m;
-            document.getElementById('mode-none').className = m === 'none' ? 'w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
-            document.getElementById('mode-famine').className = m === 'famine' ? 'w-full py-3 px-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
-            document.getElementById('mode-desc').innerText = m === 'none' ? 'Simulation 1: Everyone survives regardless of DNA.' : 'Simulation 2: People with "ll" DNA cannot survive famine.';
+            
+            // UI Button styling
+            const btnNone = document.getElementById('mode-none');
+            const btnFamine = document.getElementById('mode-famine');
+            const btnTrace = document.getElementById('mode-trace');
+            
+            btnNone.className = m === 'none' ? 'w-full py-3 px-4 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
+            btnFamine.className = m === 'famine' ? 'w-full py-3 px-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
+            btnTrace.className = m === 'trace' ? 'w-full py-3 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 font-bold flex items-center justify-between' : 'w-full py-3 px-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 text-slate-600 font-bold flex items-center justify-between';
+
+            // Description text
+            const desc = document.getElementById('mode-desc');
+            if(m === 'none') desc.innerText = 'Simulation 1: Everyone survives regardless of DNA.';
+            if(m === 'famine') desc.innerText = 'Simulation 2: People with "ll" DNA cannot survive famine.';
+            if(m === 'trace') desc.innerText = 'Simulation 3: Tracking offspring specifically from Ll x Ll crosses.';
+
             document.getElementById('famine-overlay').classList.toggle('hidden', m !== 'famine');
+            document.getElementById('trace-info').classList.toggle('hidden', m !== 'trace');
+            document.getElementById('village-title').innerText = m === 'trace' ? 'The Family Lineage' : 'The Village';
+
             resetGame();
         }
 
         function nextGeneration() {
-            if (generation >= 5) {
-                return;
-            }
+            if (generation >= 5) return;
 
-            let parents = [...population];
+            let nextPop = [];
             
-            // In Famine mode, "ll" people don't get to be parents
-            if (mode === 'famine') {
-                parents = population.filter(p => p.a1 === 'L' || p.a2 === 'L');
+            if (mode === 'trace') {
+                // For Trace mode, we force the cross: Ll x Ll
+                // Parents are fixed as Ll for every child generation
+                for (let i = 0; i < 40; i++) {
+                    const p1 = { a1: 'L', a2: 'l' };
+                    const p2 = { a1: 'L', a2: 'l' };
+                    const a1 = Math.random() > 0.5 ? p1.a1 : p1.a2;
+                    const a2 = Math.random() > 0.5 ? p2.a1 : p2.a2;
+                    nextPop.push({ a1, a2 });
+                }
+            } else {
+                let parents = [...population];
+                if (mode === 'famine') {
+                    parents = population.filter(p => p.a1 === 'L' || p.a2 === 'L');
+                }
+                
                 if (parents.length < 2) {
                     alert("Population too small to continue!");
                     return;
                 }
-            }
 
-            let nextPop = [];
-            for (let i = 0; i < 40; i++) {
-                // Randomly pick two parents
-                const p1 = parents[Math.floor(Math.random() * parents.length)];
-                const p2 = parents[Math.floor(Math.random() * parents.length)];
-                
-                // Inherit alleles (50/50 chance from each parent)
-                const a1 = Math.random() > 0.5 ? p1.a1 : p1.a2;
-                const a2 = Math.random() > 0.5 ? p2.a1 : p2.a2;
-                
-                nextPop.push({ a1, a2 });
+                for (let i = 0; i < 40; i++) {
+                    const p1 = parents[Math.floor(Math.random() * parents.length)];
+                    const p2 = parents[Math.floor(Math.random() * parents.length)];
+                    const a1 = Math.random() > 0.5 ? p1.a1 : p1.a2;
+                    const a2 = Math.random() > 0.5 ? p2.a1 : p2.a2;
+                    nextPop.push({ a1, a2 });
+                }
             }
 
             population = nextPop;
@@ -213,10 +245,9 @@
             document.getElementById('bar-l').style.width = percentSmallL + '%';
             document.getElementById('gen-display').innerText = `Generation: ${generation}`;
 
-            // Add to timeline
             const timeline = document.getElementById('timeline');
             const bar = document.createElement('div');
-            bar.className = 'flex-1 bg-blue-400 rounded-t';
+            bar.className = mode === 'trace' ? 'flex-1 bg-indigo-400 rounded-t' : 'flex-1 bg-blue-400 rounded-t';
             bar.style.height = `${percentL}%`;
             timeline.appendChild(bar);
 
